@@ -54,29 +54,11 @@ class PostType < GraphQL::Schema::Object
 end
 ```
 
-### `preload_scope`
-
-Starting with Rails 4.1, you can scope your preloaded records by passing a valid scope to [`ActiveRecord::Associations::Preloader`](https://apidock.com/rails/v4.1.8/ActiveRecord/Associations/Preloader/preload). Scoping can improve performance by reducing the number of models to be instantiated and can help with certain business goals (e.g., only returning records that have not been soft deleted).
-
-This functionality is surfaced through the `preload_scope` option:
-
-```ruby
-class UserType < GraphQL::Schema::Object
-  field :posts, [PostType], null: false,
-                            preload: :posts,
-                            preload_scope: ->(*) { Post.order(rating: :desc) }
-end
-```
-
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/ConsultingMD/graphql-preload.
+To release a new version of the gem, create a new tag and push it to GitHub.
 
 ## License
 
