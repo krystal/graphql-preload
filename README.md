@@ -4,6 +4,8 @@
 
 Provides a DSL for the [`graphql` gem](https://github.com/rmosolgo/graphql-ruby) that allows ActiveRecord associations to be preloaded in field definitions. Based on a [gist](https://gist.github.com/theorygeek/a1a59a2bf9c59e4b3706ac68d12c8434) by @theorygeek.
 
+This fork works with Ruby on Rails 6.0 and GraphQL-Ruby 1.10 (but not in interpreter mode yet).
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -25,21 +27,24 @@ Or install it yourself as:
 First, enable preloading in your `GraphQL::Schema`:
 
 ```ruby
-Schema = GraphQL::Schema.define do
+class PreloadSchema < GraphQL::Schema
   use GraphQL::Batch
 
   enable_preloading
+
+  query QueryType
 end
 ```
 
 Call `preload` when defining your field:
 
 ```ruby
-PostType = GraphQL::ObjectType.define do
-  name 'Post'
+class PostType < GraphQL::Schema::Object
+  # This runs Post.includes(:comments) but only if comments are requested
+  field :comments,  [CommentType], null: false, preload: :comments
 
-  field :comments, !types[!CommentType] do
-    # Post.includes(:comments)
+  # Block syntax is supported too
+  field :comments,  [CommentType], null: false
     preload :comments
 
     # Post.includes(:comments, :authors)
@@ -47,8 +52,6 @@ PostType = GraphQL::ObjectType.define do
 
     # Post.includes(:comments, authors: [:followers, :posts])
     preload [:comments, { authors: [:followers, :posts] }]
-
-    resolve ->(obj, args, ctx) { obj.comments }
   end
 end
 ```
@@ -59,20 +62,10 @@ Starting with Rails 4.1, you can scope your preloaded records by passing a valid
 This functionality is surfaced through the `preload_scope` option:
 
 ```ruby
-PostType = GraphQL::ObjectType.define do
-  name 'Post'
-
-  field :comments, !types[!CommentType] do
-    preload :comments
-    preload_scope ->(args, ctx) { Comment.where(deleted_at: nil) }
-
-    # Resolves with records returned from the following query:
-    # SELECT "comments".*
-    # FROM "comments"
-    # WHERE "comments"."deleted_at" IS NULL
-    #   AND "comments"."post_id" IN (1, 2, 3)
-    resolve ->(obj, args, ctx) { obj.comments }
-  end
+class UserType < GraphQL::Schema::Object
+  field :posts, [PostType], null: false,
+                            preload: :posts,
+                            preload_scope: ->(*) { Post.order(rating: :desc) }
 end
 ```
 

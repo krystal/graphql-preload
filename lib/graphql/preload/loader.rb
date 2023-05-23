@@ -39,12 +39,10 @@ module GraphQL
         return unless preload_scope
         return if Gem::Version.new(ActiveRecord::VERSION::STRING) < Gem::Version.new("6.0.0")
 
-        # See https://github.com/rails/rails/issues/36638 for details
-        # Solution adapted from https://gist.github.com/palkan/03eb5306a1a3e8addbe8df97a298a466
         if preloader.is_a?(::ActiveRecord::Associations::Preloader::AlreadyLoaded)
           raise ArgumentError,
-              "Preloading association twice is not possible. " \
-              "To resolve this add `preload #{association.inspect}` to the GraphQL field definition."
+              "Preloading association twice with scopes is not possible. " \
+              "To resolve this problem add a scoped association (e.g., `has_many :records, -> { scope_name }, ...`) to the model"
         end
 
         # this commit changes the way preloader works with scopes
