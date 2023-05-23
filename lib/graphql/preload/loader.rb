@@ -35,15 +35,12 @@ module GraphQL
       end
 
       private def preload_association(records)
-        preloader = ActiveRecord::Associations::Preloader.new.preload(records, association, preload_scope).first
+        preloader = ActiveRecord::Associations::Preloader.new(
+          records: records,
+          associations: association,
+          scope: preload_scope
+        ).call.first
         return unless preload_scope
-        return if Gem::Version.new(ActiveRecord::VERSION::STRING) < Gem::Version.new("6.0.0")
-
-        if preloader.is_a?(::ActiveRecord::Associations::Preloader::AlreadyLoaded)
-          raise ArgumentError,
-              "Preloading association twice with scopes is not possible. " \
-              "To resolve this problem add a scoped association (e.g., `has_many :records, -> { scope_name }, ...`) to the model"
-        end
 
         # this commit changes the way preloader works with scopes
         # https://github.com/rails/rails/commit/2847653869ffc1ff5139c46e520c72e26618c199#diff-3bba5f66eb1ed62bd5700872fcd6c632
