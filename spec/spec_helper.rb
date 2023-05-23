@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require "bundler/setup"
 require "graphql/preload"
 require "rspec-sqlimit"
-require "pry"
 require "yaml"
 
 TESTING_GRAPHQL_RUBY_INTERPRETER =
