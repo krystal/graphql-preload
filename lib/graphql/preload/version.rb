@@ -1,7 +1,7 @@
 module GraphQL
   module Preload
 
-    VERSION_FILE_ROOT = File.expand_path('../../VERSION', __dir__)
+    VERSION_FILE_ROOT = File.expand_path('../../../VERSION', __dir__)
     if File.file?(VERSION_FILE_ROOT)
       VERSION = File.read(VERSION_FILE_ROOT).strip.sub(/\Av/, '')
     else
